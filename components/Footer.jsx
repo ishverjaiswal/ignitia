@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import React, { useRef, useEffect } from 'react'
-import gsap from 'gsap'
 
 export default function Footer() {
   const logoRef = useRef(null)

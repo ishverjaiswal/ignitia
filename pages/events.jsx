@@ -3,11 +3,11 @@ import Head from 'next/head'
 import EventCard from '../components/events/EventCard'
 
 const SAMPLE_EVENTS = [
-  { id: 'e1', title: 'Main Stage Concert', date: '2025-12-05', venue: 'PSIT Arena', time: '7:00 PM', coordinator: 'A. Sharma', price: 499, image: '/gallery/img1.svg' },
-  { id: 'e2', title: 'E-Sports Tournament', date: '2025-12-06', venue: 'Gaming Hall', time: '3:00 PM', coordinator: 'G. Singh', price: 299, image: '/gallery/img2.svg' },
-  { id: 'e3', title: 'Cultural Night', date: '2025-12-07', venue: 'Open Grounds', time: '8:00 PM', coordinator: 'R. Kaur', price: 599, image: '/gallery/img3.svg' },
-  { id: 'e4', title: 'Workshops & Talks', date: '2025-12-08', venue: 'Conference Hall', time: '10:00 AM', coordinator: 'S. Patel', price: 199, image: '/gallery/img5.svg' },
-  { id: 'e5', title: 'Afterparty Aftermovie', date: '2025-12-09', venue: 'Rooftop', time: '11:00 PM', coordinator: 'D. Verma', price: 299, image: '/gallery/img6.svg' }
+  { id: 'e1', title: 'Main Stage Concert', date: '2025-12-05', venue: 'PSIT Arena', time: '7:00 PM', coordinator: 'A. Sharma', price: 499, image: 'https://www.tpimagazine.com/wp-content/uploads/2022/07/88rising-AI-Visuals-web.jpg' },
+  { id: 'e2', title: 'E-Sports Tournament', date: '2025-12-06', venue: 'Gaming Hall', time: '3:00 PM', coordinator: 'G. Singh', price: 299, image: 'https://img.freepik.com/premium-photo/photo-esports-competition-gamer-competing-esports-tournament_1002555-7064.jpg?w=2000' },
+  { id: 'e3', title: 'Cultural Night', date: '2025-12-07', venue: 'Open Grounds', time: '8:00 PM', coordinator: 'R. Kaur', price: 599, image: 'https://globaloneassist.com/wp-content/uploads/2018/05/cutural-night-2.jpeg' },
+  { id: 'e4', title: 'Workshops & Talks', date: '2025-12-08', venue: 'Conference Hall', time: '10:00 AM', coordinator: 'S. Patel', price: 199, image: 'https://tse2.mm.bing.net/th/id/OIP.1Qb3ada1f9iLTXsSeOSY1gHaFj?pid=Api&P=0&h=180' },
+  { id: 'e5', title: 'Afterparty Aftermovie', date: '2025-12-09', venue: 'Rooftop', time: '11:00 PM', coordinator: 'D. Verma', price: 299, image: 'https://i.ytimg.com/vi/KfeR48gIENc/maxresdefault.jpg' }
 ]
 
 export default function EventsPage(){

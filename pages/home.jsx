@@ -1,6 +1,7 @@
 // pages/home.jsx
 import Head from "next/head";
 import React, { useEffect, useRef } from "react";
+import ScrollRevealText from '../components/ScrollRevealText'
 // three.js and gsap are dynamically imported inside effects to avoid
 // server-side bundling and Vercel build-time errors.
 
@@ -17,6 +18,9 @@ function CinematicHero3D() {
     let renderer = null;
     let frameId = null;
     let mounted = true;
+
+    let scrollY = 0;
+    let onScroll = null;
 
     (async () => {
       // dynamic imports keep these browser-only libraries out of server bundles
@@ -125,6 +129,10 @@ function CinematicHero3D() {
       orb.position.y = 0.3;
       root.add(orb);
 
+      // track scroll-driven rotation/parallax
+      onScroll = () => { scrollY = window.scrollY || window.pageYOffset || 0; };
+      window.addEventListener('scroll', onScroll, { passive: true });
+
       // Light cone
       const coneGeo = new THREE.ConeGeometry(2.3, 5.2, 64, 1, true);
       const coneMat = new THREE.MeshBasicMaterial({
@@ -212,6 +220,14 @@ function CinematicHero3D() {
         camera.position.x += (parallaxX - camera.position.x * 0.08);
         camera.position.y += (1.8 + parallaxY - camera.position.y) * 0.06;
         camera.lookAt(target);
+        // scroll-linked mini-rotation for golden orb (adds to base rotation)
+        const docHeight = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+        const scrollNorm = Math.min(scrollY / docHeight, 1);
+        // rotate orb slowly based on scroll position and elapsed time
+        orb.rotation.y += 0.002 + scrollNorm * 0.008;
+        // parallax: foreground (halo) moves faster, background (dust) moves slower
+        halo.position.x = Math.sin(t * 0.2) * 0.05 + (scrollNorm - 0.5) * 0.18; // foreground sway
+        dust.position.x = (scrollNorm - 0.5) * 0.06; // background subtle shift
         renderer.render(scene, camera);
         frameId = requestAnimationFrame(animate);
       };
@@ -238,6 +254,7 @@ function CinematicHero3D() {
       try { cancelAnimationFrame(frameId); } catch (e) {}
       try { window.removeEventListener("resize", () => {}); } catch (e) {}
       try { mount.removeEventListener("mousemove", () => {}); } catch (e) {}
+      try { window.removeEventListener('scroll', onScroll); } catch (e) {}
       try {
         if (renderer && mount && mount.contains(renderer.domElement)) {
           mount.removeChild(renderer.domElement);
@@ -540,6 +557,14 @@ export default function Home() {
               progress, and innovation. Ignitia brings together technology, culture,
               and creativity in a cinematic, immersive way.
             </p>
+            <div className="mt-6 max-w-2xl mx-auto md:mx-0">
+              <ScrollRevealText
+                lines={[
+                  'A futuristic festival where art, code and performance collide.',
+                  'Immerse yourself in light, sound and motion — and spark your creative fire.'
+                ]}
+              />
+            </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
               <a
                 href="#about"

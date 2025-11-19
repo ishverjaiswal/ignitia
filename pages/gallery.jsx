@@ -4,6 +4,7 @@ import Head from "next/head";
 /* Helper: load external script and resolve when ready */
 function loadScript(src) {
   return new Promise((resolve, reject) => {
+    if (typeof document === 'undefined') return resolve();
     if (document.querySelector(`script[src="${src}"]`)) {
       return resolve();
     }

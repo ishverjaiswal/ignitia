@@ -77,9 +77,25 @@ export default function EventCard({ event, onAdd, autoCheckout = false }) {
           </div>
         </div>
 
-        {/* PRICE + ADD BUTTON (FIXED) */}
+        {/* PRICE + CART ICON + ADD BUTTON */}
         <div className="flex items-center justify-between relative z-40 pointer-events-auto">
-          <div className="text-gold font-semibold text-xl">₹{event.price}</div>
+          <div className="flex items-center gap-3">
+            <div className="text-gold font-semibold text-xl">₹{event.price}</div>
+
+            {/* Cart icon (opens drawer) */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(true);
+              }}
+              aria-label="Open cart"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/40 border border-yellow-600 text-yellow-300 hover:bg-black/60 transition"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
 
           <button
             onClick={() => {
@@ -90,8 +106,8 @@ export default function EventCard({ event, onAdd, autoCheckout = false }) {
                 image: event.image,
               }
 
+              // Add to cart but DO NOT open the drawer
               addToCart(item)
-              setOpen(true)
 
               if (autoCheckout) {
                 setTimeout(() => {
