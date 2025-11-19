@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #__next {
+  height: 100%;
+}
+
+:root{
+  --ignitia-bg: radial-gradient(1000px 400px at 10% 10%, rgba(211,157,47,0.06), transparent), linear-gradient(180deg,#1a0622 0%, #050005 100%);
+  --gold: #d4af37;
+}
+
+body {
+  background: var(--ignitia-bg);
+  color: #e6e6e6;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+/* Ensure main content creates proper contrast and min-height */
+main {
+  min-height: 100vh;
+}
+
+/* short pop animation for cart badge */
+@keyframes pop-bump { 0% { transform: scale(1) } 40% { transform: scale(1.45) } 100% { transform: scale(1) } }
+.animate-bounce-short { animation: pop-bump 420ms cubic-bezier(.2,.8,.2,1); }
+
+.text-gold { color: var(--gold) !important }
+.border-gold { border-color: rgba(212,175,55,0.95) !important }

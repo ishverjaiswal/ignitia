@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="g2" x1="0" x2="1">
+      <stop offset="0" stop-color="#0f0310"/>
+      <stop offset="1" stop-color="#2c0626"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g2)"/>
+  <g fill="#ffd659" font-family="Inter, sans-serif" text-anchor="middle">
+    <text x="50%" y="46%" font-size="64" font-weight="700">IGNITIA 2K23</text>
+    <text x="50%" y="56%" font-size="28" fill="#fff" opacity="0.9">Minimal Black & Gold Showcase</text>
+  </g>
+  <rect x="80" y="120" width="420" height="260" rx="20" fill="#120012" opacity="0.12" />
+  <rect x="900" y="480" width="360" height="220" rx="18" fill="#1b0410" opacity="0.10" />
+</svg>

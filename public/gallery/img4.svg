@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <defs>
+    <linearGradient id="g4" x1="0" x2="1">
+      <stop offset="0" stop-color="#1a0018"/>
+      <stop offset="1" stop-color="#15000f"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g4)"/>
+  <g fill="#ffd659" font-family="Inter, sans-serif" text-anchor="middle">
+    <text x="50%" y="46%" font-size="56" font-weight="700">Crowd & Energy</text>
+    <text x="50%" y="56%" font-size="22" fill="#fff" opacity="0.9">Moments from the main arena</text>
+  </g>
+  <circle cx="1100" cy="700" r="120" fill="rgba(255,200,60,0.06)"/>
+</svg>

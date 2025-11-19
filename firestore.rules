@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow each authenticated user to create/read/update/delete only their own user doc
+    match /users/{userId} {
+      // create allowed only when auth.uid matches the new document id (prevents others creating under another uid)
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // read/update/delete only allowed for the owner
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Default: deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
