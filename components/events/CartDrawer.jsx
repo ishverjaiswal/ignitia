@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { useCart } from "../../context/CartContext";
-import { useAuth } from "../../context/AuthContext";  // ✅ IMPORTANT
+import { useAuth } from "../../context/AuthContext";
 
 export default function CartDrawer() {
   const { cart, removeFromCart, updateQty, total, open, setOpen, clearCart } = useCart();
@@ -14,8 +14,7 @@ export default function CartDrawer() {
         if (!window.gsap) {
           await new Promise((res, rej) => {
             const s = document.createElement("script");
-            s.src =
-              "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
+            s.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js";
             s.onload = res;
             s.onerror = rej;
             document.head.appendChild(s);
@@ -24,20 +23,12 @@ export default function CartDrawer() {
 
         const gsap = window.gsap;
         if (open) {
-          gsap.to(ref.current, {
-            x: 0,
-            duration: 0.5,
-            ease: "power3.out",
-          });
+          gsap.to(ref.current, { x: 0, duration: 0.5, ease: "power3.out" });
         } else {
-          gsap.to(ref.current, {
-            x: "120%",
-            duration: 0.45,
-            ease: "power3.in",
-          });
+          gsap.to(ref.current, { x: "120%", duration: 0.45, ease: "power3.in" });
         }
       } catch (e) {
-        console.warn("GSAP failed to load", e);
+        console.warn("GSAP load error", e);
       }
     }
     loadGSAP();
@@ -53,7 +44,7 @@ export default function CartDrawer() {
         margin: 0,
         padding: 0,
         duration: 0.45,
-        onComplete: () => removeFromCart(id),
+        onComplete: () => removeFromCart(id)
       });
     } else removeFromCart(id);
   }
@@ -65,18 +56,26 @@ export default function CartDrawer() {
       style={{ transform: "translateX(120%)" }}
     >
       <div className="pointer-events-auto h-full bg-gradient-to-b from-[#0b0210] to-[#050009] border-l border-gold/30 shadow-2xl p-4 flex flex-col">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-gold font-semibold text-lg">Your Cart</h3>
-          <button onClick={() => setOpen(false)} className="text-white/80">
-            Close
-          </button>
+
+        {/* ★★★★★ TOP — TOTAL + BUTTON ★★★★★ */}
+        <div className="pb-4 border-b border-gold/10">
+          <div className="flex items-center justify-between text-white/90 mb-3">
+            <div className="text-lg font-medium">Total</div>
+            <div className="text-gold font-semibold">₹{total}</div>
+          </div>
+
+          <CheckoutButton total={total} clearCart={clearCart} setOpen={setOpen} />
         </div>
 
-        {/* ITEMS */}
-        <div className="flex-1 overflow-auto space-y-3 mb-4">
-          {cart.length === 0 && (
-            <div className="text-white/70">Cart is empty</div>
-          )}
+        {/* HEADER */}
+        <div className="flex items-center justify-between mt-4 mb-2">
+          <h3 className="text-gold font-semibold text-lg">Your Cart</h3>
+          <button onClick={() => setOpen(false)} className="text-white/80">Close</button>
+        </div>
+
+        {/* ITEMS LIST */}
+        <div className="flex-1 overflow-auto space-y-3 mt-2 mb-4">
+          {cart.length === 0 && <div className="text-white/70">Cart is empty</div>}
 
           {cart.map((it) => (
             <div
@@ -84,23 +83,15 @@ export default function CartDrawer() {
               id={"cart-item-" + it.id}
               className="flex items-center gap-3 bg-[#09020a] p-3 rounded-lg border border-gold/10"
             >
-              <img
-                src={it.image}
-                className="w-16 h-12 object-cover rounded"
-                alt="thumb"
-              />
+              <img src={it.image} className="w-16 h-12 object-cover rounded" alt="" />
 
               <div className="flex-1">
                 <div className="text-white font-medium">{it.title}</div>
-                <div className="text-sm text-white/60">
-                  ₹{it.price} × {it.qty}
-                </div>
+                <div className="text-sm text-white/60">₹{it.price} × {it.qty}</div>
 
                 <div className="mt-2 flex items-center gap-2">
                   <button
-                    onClick={() =>
-                      updateQty(it.id, Math.max(0, (it.qty || 1) - 1))
-                    }
+                    onClick={() => updateQty(it.id, Math.max(0, (it.qty || 1) - 1))}
                     className="px-2 py-1 bg-black/40 rounded"
                   >
                     -
@@ -115,24 +106,11 @@ export default function CartDrawer() {
                 </div>
               </div>
 
-              <button
-                onClick={() => handleRemove(it.id)}
-                className="text-sm text-white/80"
-              >
+              <button onClick={() => handleRemove(it.id)} className="text-sm text-white/80">
                 Remove
               </button>
             </div>
           ))}
-        </div>
-
-        {/* TOTAL + CHECKOUT */}
-        <div className="pt-4 border-t border-gold/10">
-          <div className="flex items-center justify-between text-white/90 mb-3">
-            <div>Total</div>
-            <div className="text-gold font-semibold">₹{total}</div>
-          </div>
-
-          <CheckoutButton total={total} clearCart={clearCart} setOpen={setOpen} />
         </div>
       </div>
     </div>
@@ -141,27 +119,18 @@ export default function CartDrawer() {
 
 
 // ------------------------------------------------
-// ✔ CHECKOUT BUTTON WITH LOGIN CHECK
+// CHECKOUT BUTTON
 // ------------------------------------------------
 function CheckoutButton({ total, clearCart, setOpen }) {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = React.useState(false);
 
-  // Redirect to login if not logged in
   async function handlePay() {
-    if (!user) {
-      // if user not logged in, redirect to login and open cart stays open
-      router.push("/login");
-      return;
-    }
+    if (!user) return router.push("/login");
 
-    // ensure numeric amount
-    const amount = Number(total) || 0
-    if (amount <= 0) {
-      alert('Cart total must be greater than 0')
-      return
-    }
+    const amount = Number(total) || 0;
+    if (amount <= 0) return alert("Cart total must be greater than 0");
 
     setLoading(true);
     try {
@@ -174,17 +143,17 @@ function CheckoutButton({ total, clearCart, setOpen }) {
       const data = await resp.json();
       if (!data?.orderId) throw new Error("Order not created");
 
-      // Load Razorpay script
+      // load Razorpay script
       await new Promise((res, rej) => {
         if (window.Razorpay) return res(true);
         const s = document.createElement("script");
         s.src = "https://checkout.razorpay.com/v1/checkout.js";
         s.onload = () => res(true);
-        s.onerror = () => rej(new Error('Razorpay failed to load'));
+        s.onerror = () => rej("Razorpay load failed");
         document.head.appendChild(s);
       });
 
-      const options = {
+      const rzp = new window.Razorpay({
         key: data.key,
         amount: data.amount,
         currency: data.currency,
@@ -206,15 +175,14 @@ function CheckoutButton({ total, clearCart, setOpen }) {
             router.push("/payment-failed");
           }
         },
-      };
+      });
 
-      const rzp = new window.Razorpay(options);
       rzp.open();
-      // close drawer after opening payment
-      if (typeof setOpen === 'function') setOpen(false);
+      setOpen(false);
+
     } catch (err) {
-      console.error('checkout error', err);
-      alert(err?.message || "Payment failed to start");
+      console.error("Payment error:", err);
+      alert(err.message || "Payment failed");
     } finally {
       setLoading(false);
     }
@@ -224,9 +192,10 @@ function CheckoutButton({ total, clearCart, setOpen }) {
     <button
       onClick={handlePay}
       disabled={loading || !(Number(total) > 0)}
-      aria-busy={loading}
       id="checkout-proceed"
-      className={`w-full py-3 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-semibold ${loading ? 'opacity-70 cursor-wait' : 'hover:scale-[1.02] transition-transform'}`}
+      className={`w-full py-3 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-300 text-black font-semibold ${
+        loading ? "opacity-70 cursor-wait" : "hover:scale-[1.02] transition-transform"
+      }`}
     >
       {loading ? (
         <span className="flex items-center justify-center gap-2">
@@ -237,7 +206,7 @@ function CheckoutButton({ total, clearCart, setOpen }) {
           Preparing payment...
         </span>
       ) : (
-        'Proceed to Pay'
+        "Proceed to Pay"
       )}
     </button>
   );

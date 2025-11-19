@@ -1,82 +1,35 @@
 import React, { useState } from "react";
 import { auth } from "../firebase";
-import {
-  sendSignInLinkToEmail,
-  signInWithEmailLink,
-  updatePassword,
-} from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 export default function ForgotPasswordPage() {
-  const [step, setStep] = useState("request"); // request → otp → reset
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [generatedOTP, setGeneratedOTP] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  // ============================================================
-  // 1️⃣ SEND OTP
-  // ============================================================
-  const handleSendOTP = async (e) => {
+  // Send a Firebase password-reset email. This uses Firebase's built-in
+  // password reset flow which sends a secure link to the user's email.
+  const handleSendReset = async (e) => {
     e.preventDefault();
-    setMessage("Sending OTP...");
-
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOTP(otpCode);
+    setMessage("Sending password reset email...");
 
     try {
-      // Send OTP email using Firebase auth dynamic link
       const actionCodeSettings = {
-        url: `${window.location.origin}/forgot-password?email=${email}`,
-        handleCodeInApp: true,
+        // After clicking the reset link, user will be returned to this URL.
+        url: `${window.location.origin}/login`,
+        // Whether to open the link in the app (not required for web)
+        handleCodeInApp: false,
       };
 
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-
-      // Since Firebase cannot send custom OTP directly, we show it temporarily:
-      console.log("OTP:", otpCode);
-
-      setMessage("OTP has been sent to your email!");
-      setStep("otp");
+      await sendPasswordResetEmail(auth, email, actionCodeSettings);
+      setMessage(
+        'Password reset email sent. Please check your inbox (and spam folder). Follow the link to reset your password.'
+      );
     } catch (error) {
-      setMessage(error.message);
-    }
-  };
-
-  // ============================================================
-  // 2️⃣ VERIFY OTP
-  // ============================================================
-  const handleVerifyOTP = (e) => {
-    e.preventDefault();
-
-    if (otp === generatedOTP) {
-      setMessage("OTP verified successfully!");
-      setStep("reset");
-    } else {
-      setMessage("Invalid OTP. Try again.");
-    }
-  };
-
-  // ============================================================
-  // 3️⃣ RESET PASSWORD
-  // ============================================================
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    setMessage("Updating password...");
-
-    try {
-      const user = auth.currentUser;
-
-      if (!user) {
-        setMessage("Session expired. Please request OTP again.");
-        setStep("request");
-        return;
-      }
-
-      await updatePassword(user, newPassword);
-      setMessage("Password updated successfully!");
-    } catch (error) {
-      setMessage(error.message);
+      // Friendly error message for common mistakes
+      console.error('sendPasswordResetEmail error:', error);
+      if (error.code === 'auth/user-not-found') setMessage('No account found with that email.');
+      else if (error.code === 'auth/invalid-email') setMessage('Please enter a valid email address.');
+      else setMessage(error.message || 'Failed to send password reset email.');
     }
   };
 
