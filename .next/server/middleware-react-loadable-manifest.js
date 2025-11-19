@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST="{\"home.jsx -> gsap\":{\"id\":\"home.jsx -> gsap\",\"files\":[\"static/chunks/node_modules_gsap_index_js.js\"]},\"home.jsx -> three\":{\"id\":\"home.jsx -> three\",\"files\":[\"static/chunks/node_modules_three_build_three_module_js.js\"]}}"
