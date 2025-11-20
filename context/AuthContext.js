@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
 
   // Signup with email & password, then store user in Firestore
   const signup = async (email, password, name) => {
+    if (!auth) throw new Error('Firebase client not initialized. Ensure NEXT_PUBLIC_FIREBASE_* env vars are set.')
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const uid = userCredential.user.uid
@@ -70,6 +71,7 @@ export const AuthProvider = ({ children }) => {
 
   // Login with email & password
   const login = async (email, password) => {
+    if (!auth) throw new Error('Firebase client not initialized. Ensure NEXT_PUBLIC_FIREBASE_* env vars are set.')
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       // After login, fetch user doc and set it on context so redirects work immediately
@@ -101,17 +103,20 @@ export const AuthProvider = ({ children }) => {
 
   // Logout
   const logout = async () => {
+    if (!auth) return setUser(null)
     await signOut(auth)
     setUser(null)
   }
 
   // Send password reset email
   const resetPassword = async (email) => {
+    if (!auth) throw new Error('Firebase client not initialized. Ensure NEXT_PUBLIC_FIREBASE_* env vars are set.')
     return sendPasswordResetEmail(auth, email)
   }
 
   // Sign in with Google; if new user, create Firestore doc
   const signInWithGoogle = async () => {
+    if (!auth) throw new Error('Firebase client not initialized. Ensure NEXT_PUBLIC_FIREBASE_* env vars are set.')
     try {
       const result = await signInWithPopup(auth, googleProvider)
       const firebaseUser = result.user
@@ -157,11 +162,17 @@ export const AuthProvider = ({ children }) => {
 
   // Listen for auth state changes and persist user across reloads
   useEffect(() => {
+    if (!auth) {
+      // Firebase client not initialized (likely missing NEXT_PUBLIC envs). Avoid attaching listeners.
+      setLoading(false)
+      return
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         // Optionally fetch Firestore user doc and merge additional data
         try {
-          const docRef = doc(db, 'users', currentUser.uid)
+          const docRef = db ? doc(db, 'users', currentUser.uid) : null
           const docSnap = await getDoc(docRef)
           if (docSnap.exists()) {
             const normalized = {
@@ -189,7 +200,9 @@ export const AuthProvider = ({ children }) => {
       setLoading(false)
     })
 
-    return () => unsubscribe()
+    return () => {
+      try { unsubscribe && unsubscribe() } catch (e) {}
+    }
   }, [])
 
   const value = {
