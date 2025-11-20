@@ -1,5 +1,5 @@
 // firebase.js
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -14,10 +14,36 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase ONLY on the client to avoid server-side auth initialization
+let app = null
+let auth = null
+let db = null
 
-// Export services
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-export const db = getFirestore(app);
+if (typeof window !== 'undefined') {
+  // Avoid re-initializing if HMR or multiple bundles load this file
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig)
+  } else {
+    app = getApps()[0]
+  }
+
+  try {
+    auth = getAuth(app)
+  } catch (e) {
+    // If auth initialization fails on client, log and continue (guarded usage expected)
+    // eslint-disable-next-line no-console
+    console.warn('Firebase auth init warning:', e)
+    auth = null
+  }
+
+  try {
+    db = getFirestore(app)
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('Firestore init warning:', e)
+    db = null
+  }
+}
+
+export { auth, db }
+export const googleProvider = new GoogleAuthProvider()
