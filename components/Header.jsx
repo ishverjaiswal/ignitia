@@ -52,22 +52,25 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
         {/* 🔥 BRAND LOGO */}
-        <div className="text-3xl tracking-wide font-extrabold select-none"
+        <Link
+          href="/"
+          className="text-3xl tracking-wide font-extrabold select-none"
           style={{
             color: '#FFD678',
             fontFamily: 'Playfair Display, serif',
             textShadow: '0 0 20px rgba(255,215,130,0.45)',
-          }}>
+          }}
+        >
           IGNITIA
-        </div>
+        </Link>
 
         {/* 🔥 NAVIGATION */}
         <nav className="flex-1">
           <ul
-            className="flex justify-center space-x-10 text-sm font-semibold tracking-wide"
+            className="flex justify-center space-x-40 text-sm font-semibold tracking-wide"
             style={{ color: '#e6c76b' }}
           >
-            {['Home', 'About', 'Events', 'Sponsors', 'Archives', 'Teams'].map((item, i) => (
+            {['Home', 'About', 'Events'].map((item, i) => (
               <li key={i}>
                 <Link href={`/${item.toLowerCase() === 'home' ? '' : item.toLowerCase()}`}
                   className="relative transition-all hover:text-white">

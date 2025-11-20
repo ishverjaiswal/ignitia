@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { auth } from "../../firebase";
 
 export default function CartDrawer() {
   const { cart, removeFromCart, updateQty, total, open, setOpen, clearCart } = useCart();
@@ -125,6 +126,7 @@ function CheckoutButton({ total, clearCart, setOpen }) {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = React.useState(false);
+  const { cart } = useCart();
 
   async function handlePay() {
     if (!user) return router.push("/login");
@@ -161,18 +163,37 @@ function CheckoutButton({ total, clearCart, setOpen }) {
         order_id: data.orderId,
 
         handler: async function (response) {
-          const vr = await fetch("/api/verify-payment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response),
-          });
+          try {
+            // Obtain a fresh Firebase ID token for the current user
+            const idToken = auth.currentUser ? await auth.currentUser.getIdToken(true) : null;
 
-          const vdata = await vr.json();
-          if (vdata.ok) {
-            clearCart();
-            router.push("/payment-success");
-          } else {
-            router.push("/payment-failed");
+            // Build order payload
+            const orderPayload = {
+              // If cart has multiple items, record a combined name; prefer the first item's id for itemId
+              itemId: (cart && cart[0] && cart[0].id) || null,
+              itemName: cart && cart.length === 1 ? cart[0].title : (cart || []).map(i => i.title).join(', '),
+              amountPaid: amount,
+              transactionId: response.razorpay_payment_id,
+              paymentStatus: 'success',
+            };
+
+            const verifyResp = await fetch('/api/razorpay-verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ idToken, paymentData: response, order: orderPayload })
+            });
+
+            const vdata = await verifyResp.json();
+            if (verifyResp.ok) {
+              clearCart();
+              router.push('/payment-success');
+            } else {
+              console.error('Payment verification failed', vdata);
+              router.push('/payment-failed');
+            }
+          } catch (err) {
+            console.error('Payment handler error', err);
+            router.push('/payment-failed');
           }
         },
       });
